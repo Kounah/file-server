@@ -1,5 +1,8 @@
 {% extends "layouts/_default.html" %}
 
 {% block content %}
-<pre><code>{{dir | dump(2)}}</code></pre>
+
+{% set curdir = dir %}
+{% include "components/directory.html" %}
+
 {% endblock content %}

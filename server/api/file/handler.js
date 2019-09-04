@@ -8,9 +8,9 @@ const ini = require('ini');
 module.exports.get = new Handler({
   enabled: config.api.file.handlers.get.enabled,
   method: 'GET',
-  path: '/*',
+  path: /^((?!(\/\.))\/[\w\.%]*)*$/gm,
 }).register((req, res, next) => {
-  let relp = path.relative('/', req.path);
+  let relp = path.relative('/', decodeURIComponent(req.path));
 
   let result = core.load(relp, {
     recursive: true,
@@ -36,4 +36,4 @@ module.exports.get = new Handler({
   }
 }, {
   amw: false
-})
+});

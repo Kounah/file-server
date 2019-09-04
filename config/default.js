@@ -1,3 +1,6 @@
+const path = require('path');
+const fs = require('fs');
+
 //#region credentials
 let credentials = {
   mongo: {
@@ -44,7 +47,8 @@ module.exports.server = server;
 let api = {
   file: {
     core: {
-      root: ''
+      root: '',
+      prefix: ''
     },
     handlers: {
       get: {
@@ -54,7 +58,9 @@ let api = {
   },
   web: {
     core: {
-      noCache: false
+      noCache: false,
+      cacheMaxAge: 1000 * 60 * 60,
+      assetsPath: path.join(__dirname, '../.assets')
     },
     handlers: {
       getAsset: {

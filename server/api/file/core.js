@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../../config');
 const error = require('../lib/error');
+const mime = require('mime');
 
 class LoadResult {
   /**
@@ -17,7 +18,21 @@ class LoadResult {
 
     this.kind = params.kind;
     this.path = params.path;
+    this.relp = path.relative(config.api.file.core.root, this.path);
+    this.name = path.parse(this.path).base;
+
     this.stats = params.stats || fs.statSync(params.path);
+
+    this.stats = Object.entries(this.stats)
+    .filter(e => {
+      return (
+        typeof e[1] !== 'function'
+      )
+    })
+    .reduce((p, c) => {
+      p[c[0]] = c[1];
+      return p;
+    }, {})
   }
 }
 
@@ -35,6 +50,8 @@ class FileLoadResult extends LoadResult {
       kind: 'file',
       path: params.path
     });
+
+    this.type = mime.getType(this.path);
   }
 }
 

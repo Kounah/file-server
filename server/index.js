@@ -3,7 +3,7 @@ const config = require('../config');
 const api = require('./api');
 const os = require('os');
 const http = require('http');
-const nunjucks = require('nunjucks');
+const nunjucks = require('./nunjucks');
 
 /**@type {express.Application} */
 let app = null;
@@ -19,11 +19,7 @@ function setup() {
     }
   });
   
-  nunjucks.configure('views', {
-    express: app,
-    noCache: true
-  });
-
+  nunjucks.setup(app);
   api.setup(app);
   app.use(api.lib.error.handler);
 

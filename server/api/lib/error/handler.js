@@ -29,6 +29,11 @@ function handler(err, req, res, next) {
     });
   }
 
+  if(res.headersSent) {
+    console.error(obj.toObject());
+    return;
+  }
+
   if(typeof obj === 'object' && obj !== null) {
     res.set('error-type', Object.getPrototypeOf(obj).constructor.name);
 

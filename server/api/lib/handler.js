@@ -39,13 +39,14 @@ class Handler {
 
     // setup enabled route
     let t = this;
-    this.register(((req, res, next) => {
+    this.register((function disabled(req, res, next) {
       if(!t._enabled) {
         throw new error.model.DisabledByConfigError({
           method: t._method,
           path: t._path
         });
-      } else next();
+      }
+      next();
     }), {
       unshift: true
     });
@@ -105,11 +106,11 @@ class Handler {
       throw new TypeError('\'fn\' is not a function');
 
     if(typeof options === 'object' && options !== null) {
-      if(options.amw) {
+      if(typeof options.amw === 'boolean' && options.amw === true) {
         fn = amw(fn);
       }
 
-      if(options.unshift) {
+      if(typeof options.unshift === 'boolean' && options.unshift === true) {
         this._mwstack.unshift(fn);
         return this;
       }
@@ -158,8 +159,8 @@ class Handler {
     if(typeof fn !== 'function')
       throw new Error('invalid method: \'' + this._method + '\'');
     
-
-    fn.call(app, ...this.args());
+    let args = this.args();
+    fn.call(app, ...args);
     return this;
   }
 }

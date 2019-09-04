@@ -1,0 +1,29 @@
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, 'Noto', 'Roboto', 'Calibri', 'Helvetica';
+  background-color: $c-bg;
+  color: $c-fg;
+
+  max-width: 100vw;
+}
+
+a[href] {
+  color: $c-link;
+}
+
+a[href]:visited {
+  color: $c-link-visited;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+main, header, footer {
+  max-width: 100%;
+  overflow: hidden;
+}

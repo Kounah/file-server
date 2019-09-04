@@ -2,11 +2,12 @@
 
 /**
  * creates a middleware function from fn
- * @param {Promise|{(req: express.Request, res: express.Response, next: () => void) => void}} fn 
+ * @param {(req: express.Request, res: express.Response, next: () => void) => void} fn 
+ * @returns {(req: express.Request, res: express.Response, next: () => void) => void}
  */
 function amw(fn) {
-  return function(req, res, next) {
-    Promise.resolve(fn).then(() => {
+  return function amwWrapped(req, res, next) {
+    Promise.resolve(fn(req, res, next)).then(() => {
       next();
     }).catch(err => {
       next(err);

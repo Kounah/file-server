@@ -1,0 +1,11 @@
+<!-- begin components/file.html -->
+<div class="file">
+  <div class="file-info">
+    <a href="/{{curfile.relp}}" class="file-name">{{curfile.name}}</a>
+  </div>
+
+  {% if 'image' in curfile | dump %}
+    <img src="/{{curfile.relp}}" >
+  {% endif %}
+</div>
+<!-- end components/file.html -->

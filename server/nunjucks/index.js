@@ -18,10 +18,10 @@ function setup(app) {
     autoescape: config.nunjucks.autoescapep
   });
 
-  // extensions.setup(njs);
-  // filters.setup(njs);
+  extensions.setup(njs);
+  filters.setup(njs);
 
-  // njs.addGlobal('__config', config);
+  njs.addGlobal('__config', config);
 
   return njs;
 }

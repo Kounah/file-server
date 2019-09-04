@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-'use strict';
-
 const simpleFileServer = require('../index');
 
 simpleFileServer.server.setup();
