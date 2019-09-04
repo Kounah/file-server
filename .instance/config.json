@@ -1,0 +1,17 @@
+{
+  "api": {
+    "file": {
+      "core": {
+        "root": "/mnt/c/Users/kev55/Pictures"
+      }
+    },
+    "web": {
+      "core": {
+        "noCache": true
+      }
+    }
+  },
+  "nunjucks": {
+    "noCache": true
+  }
+}

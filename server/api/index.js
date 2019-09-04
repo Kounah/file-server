@@ -2,6 +2,7 @@ const express = require('express');
 const lib = require('./lib');
 const Handler = require('./lib/handler');
 const fileApi = require('./file');
+const webApi = require('./web');
 
 module.exports.lib = lib;
 
@@ -16,7 +17,9 @@ function applyHandlers(app, ...modules) {
       /**@type {Handler} */
       let r = e[1];
       return r;
-    }).forEach(h => {
+    })
+    .filter(h => h instanceof Handler)
+    .forEach(h => {
       h.apply(app);
     })
   })
@@ -28,7 +31,9 @@ function applyHandlers(app, ...modules) {
  */
 function setup(app) {
   applyHandlers(app,
-    fileApi.handler);
+    webApi.handler,
+    fileApi.handler
+  );
 }
 
 module.exports.setup = setup;

@@ -51,8 +51,30 @@ let api = {
         enabled: true
       }
     }
+  },
+  web: {
+    core: {
+      noCache: false
+    },
+    handlers: {
+      getAsset: {
+        enabled: true
+      }
+    }
   }
 }
 
 module.exports.api = api;
+//#endregion
+
+//#region nunjucks
+let nunjucks = {
+  noCache: false,
+  autoescape: true,
+  properties: {
+    themeColor: '#000000'
+  }
+}
+
+module.exports.nunjucks = nunjucks;
 //#endregion

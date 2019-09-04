@@ -43,6 +43,7 @@ class DirectoryLoadResult extends LoadResult {
    * @typedef {object} DirectoryLoadResultParams
    * @prop {string} path
    * @prop {boolean} recursive
+   * @prop {number} recursionDepth
    * @param {DirectoryLoadResultParams} params
    */
   constructor(params) {
@@ -58,10 +59,11 @@ class DirectoryLoadResult extends LoadResult {
 
     /**@type {Array.<LoadResult>} */
     this.children = [];
-    if(params.recursive) {
+    if(params.recursive && params.recursionDepth > 0) {
        this.children = fs.readdirSync(params.path)
       .map(name => generateResult(path.join(params.path, name), {
-        recursive: params.recursive
+        recursive: params.recursive,
+        recursionDepth: params.recursionDepth - 1
       }));
     }
   }
@@ -71,6 +73,7 @@ class DirectoryLoadResult extends LoadResult {
  * generates result, directories are loaded recursively
  * @typedef {object} GenerateResultOptions
  * @prop {boolean} recursive
+ * @prop {number} recursionDepth
  * @param {string} p 
  * @param {GenerateResultOptions} options
  */
@@ -78,7 +81,7 @@ function generateResult(p, options) {
   if(!fs.existsSync(p))
     throw new error.model.NotFoundError({
       resource: {
-        name: pathseg,
+        name: p,
         description: 'a file or directory requested for the file server functionality'
       }
     });
@@ -86,12 +89,20 @@ function generateResult(p, options) {
   let stats = fs.statSync(p);
   
   if(stats.isDirectory()) {
-    return new DirectoryLoadResult({
+    if(typeof options === 'object' && options !== null)
+      return new DirectoryLoadResult({
+        path: p,
+        recursive: options.recursive,
+        recursionDepth: typeof options.recursionDepth === 'number'
+        ? options.recursionDepth
+        : Infinity
+      });
+    else return new DirectoryLoadResult({
       path: p,
-      recursive: typeof options === 'object' && options !== null
-        ? options.recursive
-        : false
+      recursive: false,
+      recursionDepth: 0
     })
+
   } else if(stats.isFile()) {
     return new FileLoadResult({
       path: p
@@ -102,6 +113,7 @@ function generateResult(p, options) {
 /**
  * @typedef {object} LoadOptions
  * @prop {boolean} recursive
+ * @prop {number} recursionDepth
  * @param {string} pathseg
  * @param {LoadOptions} options
  * @returns {LoadResult}
@@ -111,7 +123,10 @@ function load(pathseg, options) {
 
   if(typeof options === 'object' && options !== null) {
     return generateResult(p, {
-      recursive: options.recursive
+      recursive: options.recursive,
+      recursionDepth: typeof options.recursionDepth === 'number'
+      ? options.recursionDepth
+      : Infinity
     })
   } else return generateResult(p);  
 }

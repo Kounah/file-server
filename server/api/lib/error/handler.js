@@ -8,7 +8,7 @@ const ini = require('ini');
  * @param {express.Request} req 
  * @param {express.Response} res 
  */
-function handler(err, req, res) {
+function handler(err, req, res, next) {
   let obj = {};
 
   if(typeof err === 'object' && err !== null) {
@@ -30,16 +30,16 @@ function handler(err, req, res) {
   }
 
   if(typeof obj === 'object' && obj !== null) {
-    res.set('error-type', obj.prototype.constructor.name);
+    res.set('error-type', Object.getPrototypeOf(obj).constructor.name);
 
     if(obj instanceof model.ApiError) {
       res.status(obj.status.code);
-      if(req.accepts('application/json')) {
+      if(req.accepts('text/html')) {
+        res.contentType('text/html');
+        res.render('error.html', {error: obj.toObject()});
+      } else if(req.accepts('application/json')) {
         res.contentType('application/json')
         res.json(obj.toObject());
-      } else if(req.accepts('text/html')) {
-        res.contentType('text/html');
-        res.render('error.html', obj.toObject());
       } else {
         res.contentType('text/plain');
         res.render(ini.stringify(obj.toObject(), {

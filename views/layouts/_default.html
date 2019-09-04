@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="{{__config.nunjucks.properties.themeColor}}" />
+</head>
+<body>
+  {% include "components/header.html" %}
+  
+  {% include "components/nav.html" %}
+
+  <main>
+    {% block content %}{% endblock content %}
+  </main>
+
+  {% include "components/footer.html" %}
+</body>
+</html>

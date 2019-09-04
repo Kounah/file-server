@@ -9,7 +9,7 @@ const expansion = require('../lib/expansion');
 function loadConfig() {
   if(instance.exists('config.json')) {
     let instanceConfig = instance.loadJSON('config.json');
-    expansion.object.update.call(def, instanceConfig);
+    return expansion.object.update.call(def, instanceConfig);
   } else return def;
 }
 module.exports = loadConfig();

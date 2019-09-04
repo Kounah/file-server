@@ -1,13 +1,15 @@
 const path = require('path');
 
 const pat_node_modules = new RegExp(`^.*?\\${path.sep}node_modules\\${path.sep}.*$`, 'gm');
-const pat_app = new RegExp(`^.*?\\${path.sep}app\\${path.sep}.*$`, 'gm');
+const pat_app = new RegExp(`^.*?\\${path.sep}server\\${path.sep}.*$`, 'gm');
 
 function samelen(nr, max) {
-  return String(nr) + ' '.repeat(
-    String(max).length -
-    String(nr).length
-  );
+  let len = String(max).length -
+    String(nr).length;
+
+  if(len >= 0) {
+    return String(nr) + ' '.repeat(len);
+  } else return String(nr);
 }
 
 function toObject() {
@@ -65,7 +67,7 @@ class ApiError extends Error {
   }
 
   toObject() {
-    toObject.call(this);
+    return toObject.call(this);
   }
 }
 

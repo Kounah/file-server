@@ -1,5 +1,7 @@
 const express = require('express');
 const error = require('./error');
+const amw = require('./amw');
+const emw = require('./emw');
 
 /**
  * 
@@ -36,16 +38,17 @@ class Handler {
     this.apply = this.apply.bind(this);
 
     // setup enabled route
+    let t = this;
     this.register(((req, res, next) => {
-      if(!this._enabled) {
+      if(!t._enabled) {
         throw new error.model.DisabledByConfigError({
-          method: this._method,
-          path: this._path
+          method: t._method,
+          path: t._path
         });
       } else next();
-    }).bind(this), {
+    }), {
       unshift: true
-    })
+    });
   }
 
   /**
@@ -110,6 +113,8 @@ class Handler {
         this._mwstack.unshift(fn);
         return this;
       }
+    } else {
+      fn = emw(fn);
     }
 
     this._mwstack.push(fn);
@@ -146,12 +151,15 @@ class Handler {
    * @param {express.Application} app 
    */
   apply(app) {
-    let fn = app[String(this._method).toLowerCase()];
+    let m = String(this._method).toLowerCase();
+    /**@type {Function} */
+    let fn = app[m];
     
     if(typeof fn !== 'function')
       throw new Error('invalid method: \'' + this._method + '\'');
     
-    fn(...this.args());
+
+    fn.call(app, ...this.args());
     return this;
   }
 }
