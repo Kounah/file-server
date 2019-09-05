@@ -35,15 +35,18 @@ async function start() {
       (await Promise.all(
         Object.entries(os.networkInterfaces())
           .map(e => Promise.all(
-            e[1].map(iface => new Promise(resolve => {
+            e[1].map(iface => new Promise(async resolve => {
             // console.log('trying to listen on ' + iface.address + ':' + config.server.port);
               try {
-                let s = app.listen(config.server.port, iface.address, (...args) => {
-                  console.log('started listening on ' + iface.address + ':' + config.server.port, ...args);
-                  resolve(s);
+                await new Promise(resolve2 => {
+                  let s = app.listen(config.server.port, iface.address, (...args) => {
+                    console.log('started listening on ' + iface.address + ':' + config.server.port, ...args);
+                    resolve2(s);
+                  });
                 });
               } catch(err) {
                 console.error('could not listen to ' + iface.address + ':' + config.server.port);
+                resolve(null);
               }
             }))
           ))
