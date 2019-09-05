@@ -10,7 +10,7 @@
   {% if curfile.type | includes('image/') %}
     <img class="preview" src="/{{curfile.relp | browserpath}}?size=128" >
   {% elseif curfile.type | includes('video/') %}
-    <video class="preview" muted autoplay loop>
+    <video class="preview" muted loop preload="metadata">
       <source src="/{{curfile.relp | browserpath}}" type="{{curfile.type}}">
     </video>
   {% endif %}
