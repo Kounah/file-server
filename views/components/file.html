@@ -1,11 +1,17 @@
-<!-- begin components/file.html -->
-<div class="file">
-  <div class="file-info">
-    <a href="/{{curfile.relp}}" class="file-name">{{curfile.name}}</a>
-  </div>
+<div class="file flex-item">
+  <a href="/{{curfile.relp | browserpath}}?view" class="file-info">
+    <div class="file-name">
+      <span>{{curfile.name}}</span>
+      <br />
+      <span>({{curfile.stats.size | filesize }})</span>
+    </div>
+  </a>
 
-  {% if 'image' in curfile | dump %}
-    <img src="/{{curfile.relp}}" >
+  {% if curfile.type | includes('image/') %}
+    <img class="preview" src="/{{curfile.relp | browserpath}}?size=128" >
+  {% elseif curfile.type | includes('video/') %}
+    <video class="preview" muted autoplay loop>
+      <source src="/{{curfile.relp | browserpath}}" type="{{curfile.type}}">
+    </video>
   {% endif %}
 </div>
-<!-- end components/file.html -->

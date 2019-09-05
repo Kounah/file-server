@@ -13,7 +13,7 @@ const config = require('../../../config');
  * @prop {string} type
  * @param {string} fname
  * @param {LoadOptions} options
- * @returns {Promise.<LoadResult>} 
+ * @returns {Promise.<LoadResult>}
  */
 async function load(fname, options) {
   // get relative path
@@ -24,7 +24,7 @@ async function load(fname, options) {
 
     if(typeof options === 'object' && options !== null) {
       if(typeof options.noCache !== 'undefined')
-        noCache = options.noCache
+        noCache = options.noCache;
     }
 
     if(!noCache) {
@@ -37,20 +37,20 @@ async function load(fname, options) {
         if(age > config.api.web.core.cacheMaxAge) {
           // file in cache is too old, recompile
           let compiled = await compiler.compile(fname);
-          instance.save(compiled.data, relp);
+          instance.save(compiled.data, '.assets', relp);
           return compiled;
         } else {
           // load file and
           return {
-            data: instance.load(relp),
+            data: instance.load('.assets', relp),
             type: compiler.getCompilerModule(fname).type
-          }
+          };
         }
       } else {
         // cache does not have this file
 
         let compiled = await compiler.compile(fname);
-        instance.save(compiled.data, relp);
+        instance.save(compiled.data, '.assets', relp);
         return compiled;
       }
     } else {

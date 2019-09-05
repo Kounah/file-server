@@ -1,11 +1,13 @@
+// eslint-disable-next-line no-unused-vars
 const express = require('express');
+const amw = require('./amw');
 
 /**
  * inserts multiple middlewares in an existing middleware utilizing
  * the next function
- * @param {express.Request} req 
- * @param {express.Response} res 
- * @param {() => void} next 
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {() => void} next
  * @param {ExpressMiddleware} fn
  * @param {...ExpressMiddleware} fns
  * @returns {() => void}
@@ -18,8 +20,8 @@ function getNextExecutor(req, res, next, fn, ...fns) {
         return;
       }
 
-      fn(req, res, getNextExecutor(req, res, next, ...fns));
-    }
+      amw(fn)(req, res, getNextExecutor(req, res, next, ...fns));
+    };
   } else return next;
 }
 
@@ -58,16 +60,16 @@ class Accept {
 
   /**
    * registers a handler
-   * @param {string} name 
-   * @param  {...ExpressMiddleware} fns 
+   * @param {string} name
+   * @param  {...ExpressMiddleware} fns
    */
   register(name, ...fns) {
     let matching = this.handlers.filter(handler => handler.name === name);
-    
+
     if(matching.length > 0) {
       matching.forEach(handler => {
         handler.fns.push(...fns);
-      })
+      });
     } else {
       this.handlers.push({
         name: name,
@@ -80,9 +82,9 @@ class Accept {
 
   /**
    * executes the accepts handler
-   * @param {express.Request} req 
-   * @param {express.Response} res 
-   * @param {() => void} next 
+   * @param {express.Request} req
+   * @param {express.Response} res
+   * @param {() => void} next
    */
   execute(req, res, next) {
     let pri = this.priorities;
@@ -92,7 +94,7 @@ class Accept {
       if(matching.length > 0) {
         if(req.accepts(matching.name)) {
           for(let m = matching.shift(); typeof m !== 'undefined'; m = matching.shift()) {
-            getNextExecutor(req, res, next, ...m.fns)()
+            getNextExecutor(req, res, next, ...m.fns)();
           }
 
           return;

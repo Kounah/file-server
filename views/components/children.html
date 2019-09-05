@@ -1,0 +1,9 @@
+{% for child in children %}
+  {% if child.kind === "directory" %}
+    {% set curdir = child %}
+    {% include "components/directory.html" %}
+  {% elseif child.kind === "file" %}
+    {% set curfile = child %}
+    {% include "components/file.html" %}
+  {% endif %}
+{% endfor %}

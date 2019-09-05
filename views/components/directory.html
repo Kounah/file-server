@@ -1,19 +1,5 @@
-<!-- begin components/directory.html -->
-<div class="dir">
-  <div class="dir-info">
-    <a href="/{{curdir.relp}}" class="dir-name">{{curdir.name}}</a>
-  </div>
-  
-  <div class="dir-children">
-    {% for child in curdir.children %}
-      {% if child.kind === "directory" %}
-        {% set curdir = child %}
-        {% include "components/directory.html" %}
-      {% elseif child.kind === "file" %}
-        {% set curfile = child %}
-        {% include "components/file.html" %}
-      {% endif %}
-    {% endfor %}
-  </div>
-  <!-- end components/directory.html -->
+<div class="dir flex-item">
+  <a href="/{{curdir.relp | browserpath}}" class="dir-info">
+    <span class="dir-name">{{curdir.name}}</span>
+  </a>
 </div>

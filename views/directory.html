@@ -2,7 +2,12 @@
 
 {% block content %}
 
-{% set curdir = dir %}
-{% include "components/directory.html" %}
+<h1>{{dir.name}}</h1>
+
+<div class="flex-grid">
+  {% set children = dir.children %}
+  {% include "components/children.html" %}
+</div>
+
 
 {% endblock content %}

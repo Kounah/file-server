@@ -2,7 +2,7 @@
 
 /**
  * creates a middleware function from fn
- * @param {(req: express.Request, res: express.Response, next: () => void) => void} fn 
+ * @param {(req: express.Request, res: express.Response, next: () => void) => void} fn
  * @returns {(req: express.Request, res: express.Response, next: () => void) => void}
  */
 function amw(fn) {
@@ -11,8 +11,8 @@ function amw(fn) {
       next();
     }).catch(err => {
       next(err);
-    })
-  }
+    });
+  };
 }
 
 module.exports = amw;

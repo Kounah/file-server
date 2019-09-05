@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
 
 //#region credentials
 let credentials = {
@@ -7,7 +7,7 @@ let credentials = {
     username: '',
     password: ''
   }
-}
+};
 
 module.exports.credentials = credentials;
 //#endregion
@@ -20,7 +20,7 @@ let mongo = {
   port:     '27017',
   auth:     '',
   slashes:  true
-}
+};
 
 if(typeof credentials === 'object' && credentials !== null) {
   if(typeof credentials.mongo === 'object' && credentials.mongo !== null) {
@@ -38,7 +38,7 @@ module.exports.mongo = mongo;
 //#region server
 let server = {
   port: 42069
-}
+};
 
 module.exports.server = server;
 //#endregion
@@ -48,7 +48,19 @@ let api = {
   file: {
     core: {
       root: '',
-      prefix: ''
+      resize: {
+        noCache: false,
+        storage: 'resize-cache',
+        index: 'resize-cache/index.json',
+        except: [
+          'image/gif',
+          'image/svg',
+          'image/svg+xml',
+          'application/xml',
+          'image/x-icon',
+          'image/vnd.microsoft.icon'
+        ]
+      }
     },
     handlers: {
       get: {
@@ -68,7 +80,7 @@ let api = {
       }
     }
   }
-}
+};
 
 module.exports.api = api;
 //#endregion
@@ -80,7 +92,7 @@ let nunjucks = {
   properties: {
     themeColor: '#000000'
   }
-}
+};
 
 module.exports.nunjucks = nunjucks;
 //#endregion

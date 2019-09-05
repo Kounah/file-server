@@ -27,3 +27,9 @@ main, header, footer {
   max-width: 100%;
   overflow: hidden;
 }
+
+main {
+  &>h1 {
+    text-align: center;
+  }
+}
