@@ -4,6 +4,7 @@ const config = require('../../../config');
 const core = require('./core');
 const error = require('../lib/error');
 const ini = require('ini');
+const Accept = require('../lib/accept')
 
 module.exports.get = new Handler({
   enabled: config.api.file.handlers.get.enabled,
@@ -17,23 +18,34 @@ module.exports.get = new Handler({
     recursionDepth: 1
   });
 
-  if(req.accepts('text/html')) {
-    res.status(200).contentType('text/html');
+  new Accept({
+    raw: req.headers['accept']
+  }).register('image/*', (req, res, next) => {
+
+    res
+    .status(200)
+    .type(path.parse(result.path).ext)
+    .sendfile(result.path);
+
+  }).register('text/html', (req, res, next) => {
+
+    res
+    .status(200)
+    .type('html');
 
     if(result.kind === 'file') {
       res.render('file.html', {file: result});
     } else if(result.kind === 'directory') {
       res.render('directory.html', {dir: result});
     } else throw new Error('unknown kind for LoadResult: \'' + result.kind + '\'');
-  } else if(req.accepts('application/json')) {
+
+  }).register('application/json', (req, res, next) => {
+
     res.status(200)
-    .contentType('application/json')
+    .type('json')
     .json(result);
-  } else {
-    res.status(200)
-    .contentType('text/plain')
-    .send(ini.stringify(result));
-  }
+
+  }).execute(req, res, next);
 }, {
   amw: false
 });
