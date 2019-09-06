@@ -145,7 +145,7 @@ async function _gen_thumbs(file, ...storage) {
   let store = path.join(...storage, videohash);
   fs.mkdirpSync(store);
 
-  let process = await  new ffmpeg(`"${file}"`);
+  let process = await  new ffmpeg(path.normalize(file));
 
   let opts = config.api.file.preview.video.options;
 
