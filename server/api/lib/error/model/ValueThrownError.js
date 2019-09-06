@@ -16,13 +16,13 @@ class ValueThrownError extends ApiError {
         code: 500,
         message: 'non error-type value has been thrown as error'
       }
-    })
+    });
 
     this.data = params.data;
     this.type = typeof params.data;
     this.instance = undefined;
     if(typeof params.data === 'object' && params.data !== null) {
-      this.instance = params.data.prototype.constructor.name
+      this.instance = Object.getPrototypeOf(params.data).constructor.name;
     }
   }
 }

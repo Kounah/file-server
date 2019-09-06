@@ -9,6 +9,7 @@ const error = require('../lib/error');
 const ini = require('ini');
 const Accept = require('../lib/accept');
 const mime = require('mime');
+const preview = require('./preview');
 
 module.exports.get = new Handler({
   enabled: config.api.file.handlers.get.enabled,
@@ -34,6 +35,26 @@ module.exports.get = new Handler({
     }
 
     let t = mime.getType(result.name);
+
+    if(typeof req.query === 'object' && req.query !== null
+    && typeof req.query.preview !== 'undefined') {
+      let pre = await preview({
+        file: result.path
+      }, {
+        widht: Number(req.query.widht || req.query.w) || -1,
+        height: Number(req.query.height || req.query.h) || -1,
+        frame: Number(req.query.frame || req.query.f) || 0
+      });
+
+      res
+        .status(200)
+        .type(pre.type)
+        .send(pre.buf);
+
+      res.end();
+
+      return;
+    }
 
     if(t.startsWith('image/')) {
       res
@@ -61,6 +82,8 @@ module.exports.get = new Handler({
         }
 
         if(width || height) {
+
+          // redirect to unresized gif to spare the cache
           res.send(await core.resize({
             file: result.path,
             width,

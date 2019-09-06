@@ -1,12 +1,15 @@
+// eslint-disable-next-line no-unused-vars
 const express = require('express');
 const model = require('./model');
 const ini = require('ini');
 
+Error.stackTraceLimit = Infinity;
+
 /**
  * express error handler
- * @param {*} err 
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {*} err
+ * @param {express.Request} req
+ * @param {express.Response} res
  */
 function handler(err, req, res, next) {
   let obj = {};
@@ -43,7 +46,7 @@ function handler(err, req, res, next) {
         res.contentType('text/html');
         res.render('error.html', {error: obj.toObject()});
       } else if(req.accepts('application/json')) {
-        res.contentType('application/json')
+        res.contentType('application/json');
         res.json(obj.toObject());
       } else {
         res.contentType('text/plain');
@@ -54,9 +57,9 @@ function handler(err, req, res, next) {
     }
   } else {
     res
-    .status(500)
-    .contentType('text/plain')
-    .send('This should not be possible.');
+      .status(500)
+      .contentType('text/plain')
+      .send('This should not be possible.');
   }
 }
 

@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('../config');
 const api = require('./api');
 const os = require('os');
+// eslint-disable-next-line no-unused-vars
 const http = require('http');
 const nunjucks = require('./nunjucks');
 

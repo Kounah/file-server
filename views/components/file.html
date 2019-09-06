@@ -7,8 +7,10 @@
     </div>
   </a>
 
-  {% if curfile.type | includes('image/') %}
-    <img class="preview" src="/{{curfile.relp | browserpath}}?size=128" >
+  {% if curfile.type === "image/gif" %}
+    <img class="preview" src="/{{curfile.relp | browserpath}}?preview&w=128&h=128">
+  {% elseif curfile.type | includes('image/') %}
+    <img class="preview" src="/{{curfile.relp | browserpath}}?size=128"/>
   {% elseif curfile.type | includes('video/') %}
     <video class="preview" muted loop preload="metadata">
       <source src="/{{curfile.relp | browserpath}}" type="{{curfile.type}}">

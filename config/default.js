@@ -48,18 +48,25 @@ let api = {
   file: {
     core: {
       root: '',
-      resize: {
+    },
+    resize: {
+      noCache: false,
+      storage: 'cache/resize',
+      index: 'cache/resize/index.json',
+      except: [
+        'image/gif',
+        'image/svg',
+        'image/svg+xml',
+        'application/xml',
+        'image/x-icon',
+        'image/vnd.microsoft.icon'
+      ]
+    },
+    preview: {
+      gif: {
         noCache: false,
-        storage: 'resize-cache',
-        index: 'resize-cache/index.json',
-        except: [
-          'image/gif',
-          'image/svg',
-          'image/svg+xml',
-          'application/xml',
-          'image/x-icon',
-          'image/vnd.microsoft.icon'
-        ]
+        storage: 'cache/preview/gif',
+        index: 'cache/preview/gif/index.json'
       }
     },
     handlers: {
