@@ -150,26 +150,21 @@ async function _split_gif(file, ...storage) {
   /**@type {Array.<Frame>} */
   let frames;
 
-  try {
-    console.log(`[preview/gif][convert: '${file}' to '${target}'] started`);
-    await new Promise((resolve, reject) => {
-      im.convert([
-        file,
-        target
-      ], (err) => {
-        if(err) {
-          reject(err);
-          return;
-        }
+  console.log(`[preview/gif][convert: '${file}' to '${target}'] started`);
+  await new Promise((resolve, reject) => {
+    im.convert([
+      file,
+      target
+    ], (err) => {
+      if(err) {
+        reject(err);
+        return;
+      }
 
-        console.log(`[preview/gif][convert: '${file}' to '${target}'] done`);
-        resolve();
-      });
+      console.log(`[preview/gif][convert: '${file}' to '${target}'] done`);
+      resolve();
     });
-  } catch(err) {
-    console.error(`[preview/gif][convert: '${file}' to '${target}'] failed`, err);
-    throw err;
-  }
+  });
 
   frames = fs.readdirSync(store).map(name => {
   /**@type {Frame} */
