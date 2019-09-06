@@ -3,6 +3,7 @@ const mime = require('mime');
 const error = require('../../lib/error');
 
 const gif = require('./gif');
+const video = require('./video');
 
 /**
  * @typedef {object} PreviewParams
@@ -10,7 +11,7 @@ const gif = require('./gif');
  * @typedef {object} PreviewOptions
  * @prop {number} widht
  * @prop {number} height
- * @prop {number} frame only applies for gifs
+ * @prop {number} frame
  * @typedef {object} Preview
  * @prop {Buffer} buf
  * @prop {string} type
@@ -35,10 +36,16 @@ async function preview(params, options) {
       }
     });
 
-  switch(type) {
-  case 'image/gif':
+  if(type === 'image/gif') {
     return {
       buf: await gif(params, options),
+      type: 'image/jpg'
+    };
+  }
+
+  if(type.startsWith('video/')) {
+    return {
+      buf: await video(params, options),
       type: 'image/jpg'
     };
   }

@@ -72,11 +72,16 @@ async function preview(params, options) {
     return await _resize_optional({
       file: _get_frame_path(gif, frame)
     }, options);
-  } else if(typeof gifCache !== 'undefined' && typeof gifCache.gifs === 'object' && gifCache.gifs !== null && Array.isArray(gifCache.gifs)) {
+
+  } else if(typeof gifCache !== 'undefined'
+  && typeof gifCache.gifs === 'object'
+  && gifCache.gifs !== null
+  && Array.isArray(gifCache.gifs)) {
     // gif cache is defined
     // search for gif
 
-    let mgif = gifCache.gifs.filter(gif => gif.file === params.file).shift();
+    let mgif = gifCache.gifs
+      .filter(gif => gif.file === params.file).shift();
 
     if(typeof mgif !== 'undefined') {
       // gif exists in cache
@@ -100,12 +105,12 @@ async function preview(params, options) {
     // generate
 
     /**@type {Cache} */
-    gifCache = {};
+    gifCache = { gifs: [] };
     let f = function() { instance.saveJSON(gifCache, config.api.file.preview.gif.index); };
     setInterval(f, 5000);
 
     let gif = await _split_gif(params.file, instance.dir, config.api.file.preview.gif.storage);
-    gifCache.gifs = [gif];
+    gifCache.gifs.push(gif);
     f();
     return await _resize_optional({
       file: _get_frame_path(gif, frame)
@@ -151,13 +156,13 @@ async function _split_gif(file, ...storage) {
       im.convert([
         file,
         target
-      ], (err, stdout) => {
+      ], (err) => {
         if(err) {
           reject(err);
           return;
         }
 
-        console.log(`[preview/gif][convert: '${file}' to '${target}'] stdout:\n${stdout}`);
+        console.log(`[preview/gif][convert: '${file}' to '${target}'] done`);
         resolve();
       });
     });
