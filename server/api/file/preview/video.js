@@ -145,11 +145,16 @@ async function _gen_thumbs(file, ...storage) {
   let store = path.join(...storage, videohash);
   fs.mkdirpSync(store);
 
-  ffmpeg(file).screenshots({
-    count: config.api.file.preview.video.options.count,
-    filename: 'thumb-%s.jpg',
-    folder: store
-  });
+  try {
+    ffmpeg(file).screenshots({
+      count: config.api.file.preview.video.options.count,
+      filename: 'thumb-%s.jpg',
+      folder: store
+    });
+  } catch(err) {
+    console.log('something went wrong');
+    throw err;
+  }
 
   let files = fs.readdirSync(store).map(f => path.join(store, f));
 
