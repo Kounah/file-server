@@ -73,16 +73,7 @@ let api = {
         storage: 'cache/preview/video',
         index: 'cache/preview/video/index.js',
         options: {
-          file_name: undefined,
-          every_n_frames: undefined,
-          every_n_percentage: undefined,
-          every_n_seconds: undefined,
-          number: 1,
-          start_time: undefined,
-          frame_rate: undefined,
-          // keep_aspect_ration: false,
-          keep_pixel_aspect_ratio: false,
-          padding_color: undefined,
+          count: 16
         }
       }
     },

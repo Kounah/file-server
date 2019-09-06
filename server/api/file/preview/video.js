@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
 const crypto = require('crypto');
-const ffmpeg = require('ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
 const resize = require('../resize');
 const error = require('../../lib/error');
 const config = require('../../../../config');
@@ -145,26 +145,13 @@ async function _gen_thumbs(file, ...storage) {
   let store = path.join(...storage, videohash);
   fs.mkdirpSync(store);
 
-  let fname = path.normalize(file);
+  ffmpeg(file).screenshots({
+    count: config.api.file.preview.video.options.count,
+    filename: 'thumb-%s.jpg',
+    folder: store
+  });
 
-  if(os.platform() !== 'win32') {
-    fname = fname.split(' ').join('\\ ');
-  }
-
-  let process = await  new ffmpeg(fname);
-
-  let opts = config.api.file.preview.video.options;
-
-  let files = await new Promise((resolve, reject) =>
-    process.fnExtractFrameToJPG(store, opts, (err, files) => {
-      if(err) {
-        reject(err);
-        return;
-      }
-
-      else resolve(files);
-    })
-  );
+  let files = fs.readdirSync(store).map(f => path.join(store, f));
 
   /**@type {Array.<Thumb>} */
   let thumbs;
