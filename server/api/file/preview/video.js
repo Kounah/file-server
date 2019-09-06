@@ -148,17 +148,6 @@ async function _gen_thumbs(file, ...storage) {
   let process = await  new ffmpeg(file);
 
   let opts = config.api.file.preview.video.options;
-  try {
-    let w = process.metadata.video.resolution.w;
-    let h = process.metadata.video.resolution.h;
-
-    if(typeof w !== undefined && typeof h !== undefined) {
-      opts.size = `${w}x${h}`;
-    }
-
-  } catch (err) {
-    opts.size = undefined;
-  }
 
   let files = await new Promise((resolve, reject) =>
     process.fnExtractFrameToJPG(store, opts, (err, files) => {
