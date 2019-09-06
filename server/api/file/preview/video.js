@@ -145,17 +145,25 @@ async function _gen_thumbs(file, ...storage) {
   let store = path.join(...storage, videohash);
   fs.mkdirpSync(store);
 
-  let args = await new Promise((resolve, reject) => {
+  let files = await new Promise((resolve, reject) => {
     ffmpeg(file).screenshots({
       count: config.api.file.preview.video.options.count,
       filename: 'thumb-%s.jpg',
       folder: store
-    }).on('exit', (...args) => {
-      resolve(args)
     });
-  });
 
-  let files = fs.readdirSync(store).map(f => path.join(store, f));
+    setTimeout(function() {
+      reject(new Error('thumbnail generation timed out'));
+    }, 20000)
+
+    let wait = setInterval(function() {
+      let files = fs.readdirSync(store).map(f => path.join(store, f));
+      if(files.length > 0) {
+        clearInterval(wait);
+        resolve(files);
+      }
+    }, 200);
+  });
 
   /**@type {Array.<Thumb>} */
   let thumbs;
