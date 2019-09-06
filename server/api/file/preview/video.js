@@ -7,6 +7,7 @@ const resize = require('../resize');
 const error = require('../../lib/error');
 const config = require('../../../../config');
 const instance = require('../../../../lib/instance');
+const Promise = require('bluebird');
 
 /**
  * @typedef {object} Thumb
@@ -146,15 +147,16 @@ async function _gen_thumbs(file, ...storage) {
   fs.mkdirpSync(store);
 
   let files = await new Promise((resolve, reject) => {
-    ffmpeg(file).screenshots({
+    promisifyCommand(ffmpeg()
+      .input(file), 'screenshots')({
       count: config.api.file.preview.video.options.count,
       filename: 'thumb-%s.jpg',
       folder: store
-    });
+    }).then(files => resolve(files)).catch(err => reject(err));
 
     setTimeout(function() {
       reject(new Error('thumbnail generation timed out'));
-    }, 20000)
+    }, 20000);
 
     let wait = setInterval(function() {
       let files = fs.readdirSync(store).map(f => path.join(store, f));
@@ -233,5 +235,14 @@ async function _resize_optional(params, options) {
     file: params.file,
     width,
     height
+  });
+}
+
+function promisifyCommand (command, run='run') {
+  return Promise.promisify( (...args) => {
+    const cb = args.pop();
+    command
+      .on( 'end',   ()      => { cb(null);  } )
+      .on( 'error', (error) => { cb(error); } )[run](...args);
   });
 }
