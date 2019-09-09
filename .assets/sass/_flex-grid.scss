@@ -3,15 +3,22 @@
 
   max-width: 100%;
 
-
   flex-flow: row;
   flex-wrap: wrap;
 
   perspective: 100px;
 
+  &::after {
+    content: '';
+    flex: 2 2 0;
+    display: block;
+  }
+
   &>.flex-item {
     display: block;
     flex: 1 1 0;
+
+    align-self: center;
 
     background-color: $c-control-bg;
     color: $c-control-fg;

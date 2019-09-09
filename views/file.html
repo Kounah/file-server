@@ -1,19 +1,26 @@
 {% extends "layouts/_default.html" %}
 
+{% set ogtype = "media" %}
+
 {% block content %}
-
-
 <div class="file-view">
   <div class="media">
     {% if file.type | includes('image/') %}
+    {% set ogtype = "image" %}
     <img src="/{{file.relp | browserpath}}">
     {% elseif file.type | includes('video/') %}
-    <video autoplay>
+    {% set ogtype = "video" %}
+    <video autoplay controls>
       <source src="/{{file.relp | browserpath}}" type="{{file.type}}">
     </video>
     {% endif %}
   </div>
 </div>
-
-
 {% endblock content %}
+
+{% block header %}
+<meta property="og:title" content="{{file.name | safe}}"/>
+<meta property="og:image" content="/{{file.relp | browserpath}}?preview&height=512" />
+<meta property="og:url" content="/{{file.relp | browserpath}}?view" />
+<meta property="og:type" content="{{ogtype}}" />
+{% endblock header %}

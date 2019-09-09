@@ -1,7 +1,7 @@
-$c-bg: #17272f;
+$c-bg: #242436;
 $c-fg: #dfdfcf;
 $c-border: #000;
-$c-control-bg: #27373f;
+$c-control-bg: lighten($c-bg, 10%);
 $c-control-fg: white;
 $c-link: #8080ff;
 $c-link-visited: #ffbf80;

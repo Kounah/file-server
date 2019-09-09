@@ -45,8 +45,25 @@
 }
 
 .file-view {
+  display: flex;
+
+  &::before {
+    content: '';
+    flex: 1 1 0;
+    align-self: flex-start;
+  }
+
+  &::after {
+    content: '';
+    flex: 1 1 0;
+    align-self: flex-end;
+  }
+
   &>.media {
+    padding: 0 16px;
+
     * {
+      height: 100%;
       max-width: 100%;
     }
   }
