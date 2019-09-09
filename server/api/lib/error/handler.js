@@ -11,8 +11,11 @@ Error.stackTraceLimit = Infinity;
  * @param {express.Request} req
  * @param {express.Response} res
  */
+// eslint-disable-next-line no-unused-vars
 function handler(err, req, res, next) {
   let obj = {};
+
+  if(req.noErrorHandling) return;
 
   if(typeof err === 'object' && err !== null) {
     if(err instanceof model.ApiError) {

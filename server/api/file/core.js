@@ -35,6 +35,10 @@ class LoadResult {
         return p;
       }, {});
   }
+
+  async finish() {
+
+  }
 }
 
 class FileLoadResult extends LoadResult {
@@ -84,6 +88,10 @@ class DirectoryLoadResult extends LoadResult {
           recursionDepth: params.recursionDepth - 1
         }));
     }
+  }
+
+  async finish() {
+    this.children = await Promise.all(this.children.map(prom => Promise.resolve(prom)));
 
     this.children = this.children.sort((a, b) => {
       if(a.kind === 'file' && b.kind === 'file') {
@@ -104,18 +112,35 @@ class DirectoryLoadResult extends LoadResult {
  * @prop {boolean} recursive
  * @prop {number} recursionDepth
  * @param {string} p
- * @param {GenerateResultOptions} options
+ * @param {Promise.<GenerateResultOptions>} options
  */
-function generateResult(p, options) {
-  if(!fs.existsSync(p))
-    throw new error.model.NotFoundError({
-      resource: {
-        name: p,
-        description: 'a file or directory requested for the file server functionality'
-      }
-    });
+async function generateResult(p, options) {
+  await new Promise((resolve, reject) => {
+    fs.exists(p, exists => {
+      if(!exists) {
+        reject(new error.model.NotFoundError({
+          resource: {
+            name: p,
+            description: 'a file or directory requested for the file server functionality'
+          }
+        }));
+        return;
+      } 
 
-  let stats = fs.statSync(p);
+      resolve();
+    });
+  });
+
+  let stats = await new Promise((resolve, reject) => {
+    fs.stat(p, (err, stats) => {
+      if(err) {
+        reject(err);
+        return;
+      }
+
+      resolve(stats);
+    });
+  });
 
   if(stats.isDirectory()) {
     if(typeof options === 'object' && options !== null)
@@ -145,19 +170,19 @@ function generateResult(p, options) {
  * @prop {number} recursionDepth
  * @param {string} pathseg
  * @param {LoadOptions} options
- * @returns {LoadResult}
+ * @returns {Promise.<LoadResult>}
  */
-function load(pathseg, options) {
+async function load(pathseg, options) {
   let p = path.join(config.api.file.core.root, pathseg);
 
   if(typeof options === 'object' && options !== null) {
-    return generateResult(p, {
+    return await generateResult(p, {
       recursive: options.recursive,
       recursionDepth: typeof options.recursionDepth === 'number'
         ? options.recursionDepth
         : Infinity
     });
-  } else return generateResult(p);
+  } else return await generateResult(p);
 }
 
 module.exports.load = load;

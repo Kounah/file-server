@@ -1,17 +1,19 @@
-<div class="file flex-item">
-  <a href="/{{curfile.relp | browserpath}}?view" class="file-info">
-    <div class="file-name">
-      <span>{{curfile.name}}</span>
-      <br />
-      <span>({{curfile.stats.size | filesize }})</span>
-    </div>
-  </a>
-
-  {% if curfile.type === "image/gif" %}
-    <img class="preview" src="/{{curfile.relp | browserpath}}?preview&w=128&h=128">
-  {% elseif curfile.type | includes('image/') %}
-    <img class="preview" src="/{{curfile.relp | browserpath}}?size=128"/>
-  {% elseif curfile.type | includes('video/') %}
-    <img class="preview" src="/{{curfile.relp | browserpath}}?preview&w=128&h=128">
-  {% endif %}
+<div class="flex-item-wrapper">
+  <div class="file flex-item">
+    <a href="/{{curfile.relp | browserpath}}?view" class="file-info">
+      <div class="file-name">
+        <span>{{curfile.name}}</span>
+        <br />
+        <span>({{curfile.stats.size | filesize }})</span>
+      </div>
+    </a>
+  
+    {% if curfile.type === "image/gif" %}
+      <img class="preview" src="/{{curfile.relp | browserpath}}?preview&w=128&h=128">
+    {% elseif curfile.type | includes('image/') %}
+      <img class="preview" src="/{{curfile.relp | browserpath}}?size=128"/>
+    {% elseif curfile.type | includes('video/') %}
+      <img class="preview" src="/{{curfile.relp | browserpath}}?preview&w=128&h=128">
+    {% endif %}
+  </div>
 </div>

@@ -1,0 +1,38 @@
+.bar {
+  display: flex;
+
+  flex-flow: row;
+  flex-wrap: wrap;
+  padding: 0 8px;
+  align-items: center;
+
+  &.center {
+    &::before {
+      content: '';
+      flex: 1 1 0;
+      align-self: flex-start;
+    }
+  
+    &::after {
+      content: '';
+      flex: 1 1 0;
+      align-self: flex-end;
+    }
+  }
+
+  .button {
+    display: inline-block;
+    text-decoration: none;
+
+    padding: 8px 12px;
+    border-radius: 4px;
+
+    transition: filter .2s ease;
+
+    &:hover {
+      filter: brightness(125%);
+    }
+
+    background-color: $c-control-bg;
+  }
+}

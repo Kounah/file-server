@@ -7,6 +7,7 @@ const resize = require('../resize');
 const error = require('../../lib/error');
 const config = require('../../../../config');
 const instance = require('../../../../lib/instance');
+const instanceSync = require('../../../../lib/instanceSync');
 
 /**
  * @typedef {object} Frame
@@ -29,8 +30,8 @@ const instance = require('../../../../lib/instance');
 /**@type {Cache}*/
 let gifCache;
 
-if(instance.exists(config.api.file.preview.gif.index))
-  gifCache = instance.loadJSON(config.api.file.preview.gif.index);
+if(instanceSync.exists(config.api.file.preview.gif.index))
+  gifCache = instanceSync.loadJSON(config.api.file.preview.gif.index);
 
 /**
  * generates or loads a preview image for the gif
@@ -106,7 +107,7 @@ async function preview(params, options) {
 
     /**@type {Cache} */
     gifCache = { gifs: [] };
-    let f = function() { instance.saveJSON(gifCache, config.api.file.preview.gif.index); };
+    let f = function() { instance.saveJSON(gifCache, config.api.file.preview.gif.index).catch(err => console.log(err)); };
     setInterval(f, 5000);
 
     let gif = await _split_gif(params.file, instance.dir, config.api.file.preview.gif.storage);
@@ -137,15 +138,33 @@ function _get_frame_path(gif, frame) {
  * @returns {Gif}
  */
 async function _split_gif(file, ...storage) {
+  let gifhash = await new Promise((resolve, reject) => {
+    fs.readFile(file, (err, data) => {
+      if(err) {
+        reject(err);
+        return;
+      }
 
-  let gifhash = crypto
-    .createHash('sha256')
-    .update(fs.readFileSync(file))
-    .digest('hex');
+      resolve(crypto
+        .createHash('sha256')
+        .update(data)
+        .digest('hex'));
+    });
+  });
 
   let store = path.join(...storage, gifhash);
-  let target = path.join(store, 'frame.jpg');
-  fs.mkdirpSync(store);
+  let target = path.join(store, 'frame-%05d.jpg');
+  
+  await new Promise((resolve, reject) => {
+    fs.mkdirp(store, err => {
+      if(err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
+    });
+  });
 
   /**@type {Array.<Frame>} */
   let frames;
@@ -153,9 +172,10 @@ async function _split_gif(file, ...storage) {
   console.log(`[preview/gif][convert: '${file}' to '${target}'] started`);
   await new Promise((resolve, reject) => {
     im.convert([
+      '-coalesce',
       file,
       target
-    ], (err) => {
+    ], err => {
       if(err) {
         reject(err);
         return;
@@ -166,18 +186,36 @@ async function _split_gif(file, ...storage) {
     });
   });
 
-  frames = fs.readdirSync(store).map(name => {
-  /**@type {Frame} */
-    let frame = {
-      name,
-      hash: crypto
-        .createHash('sha256')
-        .update(fs.readFileSync(path.join(store, name)))
-        .digest('hex')
-    };
+  let dirs = await new Promise((resolve, reject) => {
+    fs.readdir(store, (err, files) => {
+      if(err) {
+        reject(err);
+        return;
+      }
 
-    return frame;
+      resolve(files);
+    });
   });
+
+  frames = await Promise.all(dirs.map(name => new Promise((resolve, reject) => {
+    fs.readFile(path.join(store, name), (err, data) => {
+      if(err) {
+        reject(err);
+        return;
+      } 
+
+      /**@type {Frame} */
+      let frame = {
+        name,
+        hash: crypto
+          .createHash('sha256')
+          .update(data)
+          .digest('hex')
+      };
+  
+      resolve(frame);
+    });
+  })));
 
   /**@type {Gif} */
   let gif = {

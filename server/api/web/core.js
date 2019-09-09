@@ -29,20 +29,20 @@ async function load(fname, options) {
 
     if(!noCache) {
       // using cache
-      if(instance.exists(relp)) {
+      if(await instance.exists(relp)) {
         // cache has this file
 
         // check age of file
-        let age = new Date().getTime() - instance.stat(relp).mtime.getTime();
+        let age = new Date().getTime() - await instance.stat(relp).mtime.getTime();
         if(age > config.api.web.core.cacheMaxAge) {
           // file in cache is too old, recompile
           let compiled = await compiler.compile(fname);
-          instance.save(compiled.data, '.assets', relp);
+          await instance.save(compiled.data, '.assets', relp);
           return compiled;
         } else {
           // load file and
           return {
-            data: instance.load('.assets', relp),
+            data: await instance.load('.assets', relp),
             type: compiler.getCompilerModule(fname).type
           };
         }
@@ -50,7 +50,7 @@ async function load(fname, options) {
         // cache does not have this file
 
         let compiled = await compiler.compile(fname);
-        instance.save(compiled.data, '.assets', relp);
+        await instance.save(compiled.data, '.assets', relp);
         return compiled;
       }
     } else {

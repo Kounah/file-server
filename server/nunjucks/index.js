@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const express = require('express');
 const nunjucks = require('nunjucks');
 const config = require('../../config');
@@ -22,6 +23,7 @@ function setup(app) {
   filters.setup(njs);
 
   njs.addGlobal('__config', config);
+  njs.addGlobal('__global', config.nunjucks.global);
 
   return njs;
 }

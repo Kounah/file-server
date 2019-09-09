@@ -7,6 +7,7 @@ const resize = require('../resize');
 const error = require('../../lib/error');
 const config = require('../../../../config');
 const instance = require('../../../../lib/instance');
+const instanceSync = require('../../../../lib/instanceSync');
 const Promise = require('bluebird');
 
 /**
@@ -30,8 +31,8 @@ const Promise = require('bluebird');
 /**@type {Cache} */
 let videoCache;
 
-if(instance.exists(config.api.file.preview.video.index))
-  videoCache = instance.loadJSON(config.api.file.preview.video.index);
+if(instanceSync.exists(config.api.file.preview.video.index))
+  videoCache = instanceSync.loadJSON(config.api.file.preview.video.index);
 
 /**
  * generates or loads a preview image for the videos
@@ -138,10 +139,19 @@ function _get_thumb_path(video, thumb) {
  * @returns {Video}
  */
 async function _gen_thumbs(file, ...storage) {
-  let videohash = crypto
-    .createHash('sha256')
-    .update(fs.readFileSync(file))
-    .digest('hex');
+  let videohash = await new Promise((resolve, reject) => {
+    fs.readFile(file, (err, data) => {
+      if(err) {
+        reject(err);
+        return;
+      }
+
+      resolve(crypto
+        .createHash('sha256')
+        .update(data)
+        .digest('hex'));
+    });    
+  });
 
   let store = path.join(...storage, videohash);
   fs.mkdirpSync(store);
@@ -170,18 +180,27 @@ async function _gen_thumbs(file, ...storage) {
   /**@type {Array.<Thumb>} */
   let thumbs;
   if(typeof files === 'object' && files !== null && Array.isArray(files)) {
-    thumbs = files.map(file => {
-      /**@type {Thumb} */
-      let t = {
-        name: path.relative(store, file),
-        hash: crypto
-          .createHash('sha256')
-          .update(fs.readFileSync(file))
-          .digest('hex')
-      };
+    thumbs = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+      fs.readFile(file, (err, data) => {
+        if(err) {
+          reject(err);
+          return;
+        }
 
-      return t;
-    });
+        let hash = crypto
+          .createHash('sha256')
+          .update(data)
+          .digest('hex');
+
+        /**@type {Thumb} */
+        let t = {
+          name: path.relative(store, file),
+          hash
+        };
+
+        resolve(t);
+      });
+    })));
   }
 
   /**@type {Video} */

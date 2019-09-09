@@ -8,6 +8,7 @@ header {
   top: 0;
 
   background-color: $c-header-bg;
+  height: $header-height;
 
   padding: 0 12px;
 
@@ -26,6 +27,7 @@ header {
 
     display: inline-block;
     height: 100%;
+    line-height: 200%;
 
     &:first-child {
       padding-left: 0;

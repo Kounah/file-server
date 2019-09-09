@@ -18,10 +18,12 @@ module.exports.get = new Handler({
 }).register(async (req, res, next) => {
   let relp = path.relative('/', decodeURIComponent(req.path));
 
-  let result = core.load(relp, {
+  let result = await core.load(relp, {
     recursive: true,
     recursionDepth: 1
   });
+
+  await result.finish();
 
   if(result.kind === 'file') {
 
@@ -94,13 +96,13 @@ module.exports.get = new Handler({
         }
       }
 
-      res.send(fs.readFileSync(result.path));
-      res.end();
+      res.setHeader('Content-Type', mime.getType(result.path));
+      res.writeHead(200);
+      fs.createReadStream(result.path).pipe(res);
     } else {
-      res
-        .status(200)
-        .type(result.path)
-        .send(fs.readFileSync(result.path));
+      res.setHeader('Content-Type', mime.getType(result.path));
+      res.writeHead(200);
+      fs.createReadStream(result.path).pipe(res);
     }
     return;
   }

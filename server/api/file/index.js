@@ -4,4 +4,4 @@ const handler = require('./handler');
 module.exports = {
   core,
   handler
-}
+};

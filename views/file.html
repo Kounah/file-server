@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="file-view">
+  <h1 class="center">{{file.name | safe}}</h1>
   <div class="media">
     {% if file.type | includes('image/') %}
     {% set ogtype = "image" %}
@@ -13,14 +14,23 @@
     <video autoplay controls>
       <source src="/{{file.relp | browserpath}}" type="{{file.type}}">
     </video>
+    {% elseif file.type | includes('pdf') %}
+    <div class="bar center">
+      <a class="button" href="/{{file.relp | browserpath}}" target="_blank">Open in new Tab</a>
+    </div>
+    {% elseif file.type | includes('text/') or file.type | includes('application/') %}
+    <pre><code>{{file.path | readfile}}</code></pre>
+    {% else %}
+    <p>no preview available</p>
     {% endif %}
   </div>
 </div>
 {% endblock content %}
 
 {% block header %}
-<meta property="og:title" content="{{file.name | safe}}"/>
-<meta property="og:image" content="/{{file.relp | browserpath}}?preview&height=512" />
-<meta property="og:url" content="/{{file.relp | browserpath}}?view" />
+<title>{{file.name | safe}} ({{file.stats.size | filesize}})</title>
+<meta property="og:title" content="{{file.name | safe}} ({{file.stats.size | filesize}}"/>
+<meta property="og:image" content="{{__global.protocol}}{{__global.host}}/{{file.relp | browserpath}}?preview&height=512" />
+<meta property="og:url" content="{{__global.protocol}}{{__global.host}}/{{file.relp | browserpath}}?view" />
 <meta property="og:type" content="{{ogtype}}" />
 {% endblock header %}

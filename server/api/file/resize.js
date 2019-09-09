@@ -3,6 +3,7 @@ const error = require('../lib/error');
 const mime = require('mime');
 const config = require('../../../config');
 const instance = require('../../../lib/instance');
+const instanceSync = require('../../../lib/instanceSync');
 const jimp = require('jimp');
 const crypto = require('crypto');
 
@@ -57,13 +58,31 @@ async function resize(params) {
 
   let mt = mime.getType(params.file);
   if(config.api.file.resize.except.includes(mt))
-    return fs.readFileSync(params.file);
+    return await new Promise((resolve, reject) => {
+      fs.readFile(params.file, (err, data) => {
+        if(err) {
+          reject(err);
+          return;
+        }
+
+        resolve(data);
+      });
+    });
 
   if(config.api.file.resize.noCache) {
-    return await _resize(fs.readFileSync(params.file), params.width, params.height, mime.getType(params.file));
-  } else if(instance.exists(config.api.file.resize.index)) {
+    return await new Promise((resolve, reject) => {
+      fs.readFile(params.file, (err, data) => {
+        if(err) {
+          reject(err);
+          return;
+        }
+
+        _resize(data, params.width, params.height, mime.getType(params.file)).then(resolve).catch(reject);
+      });
+    });
+  } else if(await instance.exists(config.api.file.resize.index)) {
     if(typeof resizeCache === 'undefined') {
-      resizeCache = instance.loadJSON(config.api.file.resize.index);
+      resizeCache = instanceSync.loadJSON(config.api.file.resize.index);
       setInterval(() => {
         instance.saveJSON(resizeCache, config.api.file.resize.index);
       }, 5000);
@@ -96,11 +115,11 @@ async function resize(params) {
           cacheEntry: match
         });
 
-        instance.save(e.buf, config.api.file.resize.storage,
+        await instance.save(e.buf, config.api.file.resize.storage,
           e.cache.hash, e.resized.name);
         resizeCache.push(e.cache);
       } else {
-        return instance.load(config.api.file.resize.storage,
+        return await instance.load(config.api.file.resize.storage,
           match.hash,
           sizeMatch.name);
       }
@@ -111,12 +130,14 @@ async function resize(params) {
 
     let e = await _resizeCache(params);
 
-    instance.save(e.buf, config.api.file.resize.storage,
+    await instance.save(e.buf, config.api.file.resize.storage,
       e.cache.hash, e.resized.name);
     resizeCache = [e.cache];
-    instance.saveJSON(resizeCache, config.api.file.resize.index);
+    await instance.saveJSON(resizeCache, config.api.file.resize.index);
     setInterval(() => {
-      instance.saveJSON(resizeCache, config.api.file.resize.index);
+      instance.saveJSON(resizeCache, config.api.file.resize.index).catch(err => {
+        console.error(err);
+      });
     }, 5000);
 
     return e.buf;
@@ -131,7 +152,7 @@ module.exports = resize;
  * @param {number} width
  * @param {number} height
  * @param {string} type mime type
- * @returns {Buffer}
+ * @returns {Promise.<Buffer>}
  */
 async function _resize(buf, width, height, type) {
   if(typeof buf !== 'object' || buf === null || !(buf instanceof Buffer))
@@ -186,7 +207,16 @@ async function _resizeCache(params, options) {
   if(typeof params.width !== 'number' || params.width < -1)
     params.width = -1;
 
-  let fileBuf = fs.readFileSync(params.file);
+  let fileBuf = await new Promise((resolve, reject) => {
+    fs.readFile(params.file, (err, data) => {
+      if(err) {
+        reject(err);
+        return;
+      }
+
+      resolve(data);
+    });
+  });
   let fileHash = crypto.createHash('sha256').update(fileBuf).digest('hex');
 
   let t = mime.getType(params.file);

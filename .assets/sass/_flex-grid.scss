@@ -8,45 +8,53 @@
 
   perspective: 100px;
 
-  &::after {
-    content: '';
-    flex: 2 2 0;
-    display: block;
-  }
-
-  &>.flex-item {
-    display: block;
+  &>.flex-item-wrapper {
+    display: flex;
     flex: 1 1 0;
 
-    align-self: center;
-
-    background-color: $c-control-bg;
-    color: $c-control-fg;
-
-    min-width: 128px;
-    height: 128px;
-
-    border: solid 1px $c-border;
-    border-radius: 3px;
-
-    margin: 8px;
-
-    overflow: hidden;
-
-    &.large {
-      min-width: 256px;
-      height: 256px;
+    &::before {
+      content: '';
+      flex: 1 1 0;
+      align-self: flex-start;
+    }
+  
+    &::after {
+      content: '';
+      flex: 1 1 0;
+      align-self: flex-end;
     }
 
-    &.small {
-      min-width: 64px;
-      height: 64px;
-    }
-
-    transition: filter .1s ease-in-out;
-
-    &:hover {
-      filter: brightness(125%);
+    &>.flex-item {
+      align-self: center;
+  
+      background-color: $c-control-bg;
+      color: $c-control-fg;
+  
+      min-width: 128px;
+      height: 128px;
+  
+      border: solid 1px $c-border;
+      border-radius: 3px;
+  
+      margin: 8px;
+  
+      overflow: hidden;
+  
+      &.large {
+        min-width: 256px;
+        height: 256px;
+      }
+  
+      &.small {
+        min-width: 64px;
+        height: 64px;
+      }
+  
+      transition: filter .1s ease-in-out;
+  
+      &:hover {
+        filter: brightness(125%);
+      }
     }
   }
 }

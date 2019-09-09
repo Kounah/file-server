@@ -4,6 +4,7 @@ const core = require('./core');
 const Handler = require('../lib/handler');
 const error = require('../lib/error');
 const config = require('../../../config');
+const mime = require('mime');
 
 module.exports.getAsset = new Handler({
   enabled: config.api.web.handlers.getAsset.enabled,
@@ -26,11 +27,17 @@ module.exports.getAsset = new Handler({
       : undefined
   });
 
-  res.status(200)
-  .type(result.type)
-  .send(result.data);
-
-  res.end();
+  if(typeof result !== 'undefined') {
+    res.status(200)
+    .type(result.type)
+    .send(result.data);
+    res.end();
+  } else {
+    res.status(200);
+    res.type(mime.getType(p));
+    res.writeHead(200);
+    fs.createReadStream(p).pipe(res);
+  }
 }, {
   amw: true
 });

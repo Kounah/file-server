@@ -1,5 +1,5 @@
 const def = require('./default');
-const instance = require('../lib/instance');
+const instance = require('../lib/instanceSync');
 const expansion = require('../lib/expansion');
 
 /**
@@ -12,4 +12,5 @@ function loadConfig() {
     return expansion.object.update.call(def, instanceConfig);
   } else return def;
 }
+
 module.exports = loadConfig();

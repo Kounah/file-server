@@ -71,7 +71,7 @@ let api = {
       video: {
         noCache: false,
         storage: 'cache/preview/video',
-        index: 'cache/preview/video/index.js',
+        index: 'cache/preview/video/index.json',
         options: {
           count: 16
         }
@@ -106,6 +106,10 @@ let nunjucks = {
   autoescape: true,
   properties: {
     themeColor: '#000000'
+  },
+  global: {
+    protocol: 'http://',
+    host: 'localhost:42069'
   }
 };
 
