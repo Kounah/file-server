@@ -63,6 +63,7 @@
     padding: 0 16px;
 
     * {
+      max-height: calc(100vh - $header-height);
       height: 100%;
       max-width: 100%;
     }
